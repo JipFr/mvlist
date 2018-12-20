@@ -1,0 +1,464 @@
+@import url('https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700');
+[data-theme="day"] {
+	--body: white;
+	--text: #191919;
+	--main: #d04040;
+	--textOnMain: white;
+	--border: #e5e5e5;
+	--title: #ebebeb;
+	--titleText: rgba(0, 0, 0, 0.9);
+}
+[data-theme="night"] {
+	--body: #191919;
+	--text: white;
+	--main: black;
+	--textOnMain: white;
+	--border: rgba(255, 255, 255, 0.1);
+	--title: #141414;
+	--titleText: white;
+}
+.fw {
+	width: 100%;
+}
+body {
+	margin: 0;
+	max-width: 100%;
+	overflow-x: hidden;
+	-webkit-user-select: none;
+	-webkit-touch-callout: none;
+	min-height: calc(100vh);
+	background: var(--body); color: var(--text);
+	font-family: Arial;
+}
+* {
+     	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+header, .behindHeader {
+	width: 100%;
+	height: 50px;
+}
+header {
+	background: var(--main);
+	position: fixed;
+	border-top: env(safe-area-inset-top) solid var(--main);
+	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+	display: flex; flex-wrap: nowrap;
+	justify-content: center; align-items: center;
+	z-index: 10005;
+}
+header img {
+	height: 32px;
+}
+.behindHeader {
+	border-top: env(safe-area-inset-top) solid transparent;
+	border-bottom: 2px solid transparent;
+}
+
+.inlineMovie {
+	padding: 0 15px;
+	margin-top: 15px; margin-bottom: 15px;
+	display: flex; flex-wrap: nowrap;
+}
+.inlineMovieRight, .inlineMovieLeft {
+	display: flex; align-items: center;
+	flex-wrap: wrap;
+}
+.inlineMovieRight {
+	padding-left: 15px;
+}
+.movieText {
+	width: 100%;
+	margin: 10px 0;
+}
+h4.movieText {
+	font-weight: 100;
+}
+
+.poster {
+	border-radius: 6px;
+	background: var(--border);
+}
+.poster.small {
+	width: 90px;
+}
+.poster.big {
+	height: 200px;
+}
+.poster.huge {
+	width: 100%;
+	max-width: 400px;
+}
+
+.posterDiv {
+	padding: 0 15px;
+}
+.posterDivImage {
+	width: 100%;
+	display: flex; flex-wrap: wrap;
+	justify-content: center;
+	align-items: flex-start;
+}
+.posterDiv .poster.huge {
+	-webkit-user-select: initial;
+    	-webkit-touch-callout: initial;
+}
+
+.recentlyWatched {
+	display: flex; flex-wrap: nowrap;
+	width: 100%; max-width: 100%;
+	overflow-x: scroll; overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+	height: 240px;
+}
+.recentlyWatched .poster.big {
+	margin: 20px 0;
+	margin-left: 20px;
+}
+.recentlyWatched .poster.big:nth-last-child(1) {
+	margin-right: 100px;
+}
+
+.container {
+	background: var(--body);
+}
+
+.navDiv {
+	position: fixed;
+	bottom: 0; left: 0;
+	padding-bottom: env(safe-area-inset-bottom);
+	width: 100%; height: 60px;
+	background: var(--body);
+	border-top: 1.5px solid var(--border);
+	display: flex; justify-content: space-around; align-items: center;
+	z-index: 9999;
+}
+.navItem {
+	opacity: 0.5;
+	padding: 10px;
+	display: flex; justify-content: center; align-items: center;
+}
+.navItem.currentPage {
+	opacity: 1;
+}
+
+.title {
+	margin: 0; padding: 0; border: 0;
+	width: 100%; text-align: center;
+	padding: 4px 0;
+	background: var(--title); color: var(--titleText);
+	border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+	font-family: "Nanum Gothic"; font-weight: 700; font-size: 1.1em;
+}
+.title.todayTitle {
+	background: #ffd462;
+	color: black;
+}
+.searchContainer, .behindSearch {
+	width: 100%;
+	height: 50px;
+	border-bottom: 2px solid transparent;
+}
+.searchContainer {
+	position: fixed;
+	top: calc(52px + env(safe-area-inset-top));
+	background: var(--main);
+	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+	display: flex; justify-content: center; align-items: center;
+}
+.searchInput {
+	-webkit-appearance: none;
+    	-moz-appearance: none;
+    	appearance: none;
+
+    	border: 0; border-radius: 0; padding: 0; margin: 0;
+    	height: calc(100% - 40px); width: calc(100% - 60px);
+    	padding: 10px 12px;
+    	border: 1px solid rgba(255, 255, 255, 0.2);
+    	font-size: 16px;
+
+    	background: var(--main);
+    	color: var(--textOnMain);
+}
+::placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.searchBox {
+	width: 100%;
+}
+
+.loadWrapper {
+	width: 100%;
+	height: 200px;
+	display: flex; justify-content: center; align-items: center;
+}
+.loadCenter {
+	width: 40px; height: 40px;
+	background: var(--main);
+	animation: loadingAnimation 6s infinite;
+}
+@keyframes loadingAnimation {
+	0% {
+		transform: rotate(0deg);
+	}
+	45% {
+		transform: rotate(360deg);
+	}
+	55% {
+		transform: rotate(360deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}
+.movieBanner {
+	position: relative;
+	width: 100%;
+	min-height: 300px;
+	position: fixed;
+	z-index: 100;
+}
+.movieBannerOverlay {
+	position: absolute;
+	left: 0; right: 0;
+	width: 100%; height: 100%;
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+	display: flex; align-items: flex-end;
+	pointer-events: none;
+}
+.movieBannerOverlayContent {
+	padding: 15px;
+}
+.movieBannerWrapper {
+	min-height: 300px;
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+}
+.movieInfo {
+	background: var(--body);
+	position: absolute;
+	z-index: 101;
+	padding-bottom: calc(env(safe-area-inset-bottom) + 77px);
+}
+
+
+.movieInfo {
+	position: absolute;
+	left: 0;
+}
+.topMovieInfo {
+	width: 100%;
+}
+
+.topMovieInfoViewed {
+	padding: 40px;
+	text-align: center;
+	font-size: 1.2em;
+}
+.topMovieInfoAddRemove {
+	display: flex;
+	flex-wrap: nowrap;
+	margin-top: 15px;
+}
+.topMovieInfoAddRemoveButton {
+	width: 100%; height: 130px;
+	display: flex; flex-wrap: wrap;
+	justify-content: center; align-items: center;
+	color: white;
+	font-size: 50px;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0.5);
+}
+.topMovieInfoAddRemoveButton p {
+	margin: 0;
+}
+
+.topMovieInfoAdd {
+	background: #d04040;
+}
+.topMovieInfoRemove {
+	background: #07c05f;
+}
+.movieBit {
+	padding: 15px;
+}
+.movieNav {
+	display: flex; justify-content: center; align-items: center;
+	width: 50px; height: 50px;
+	background: rgba(0, 0, 0, 0.5);
+	font-size: 30px; color: white;
+	border-radius: 50%;
+}
+.spread {
+	display: flex; 
+	justify-content: space-between;
+}
+.movieInfoPart {
+	padding: 0 15px;
+	padding-top: 30px;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+	font-weight: 700;
+}
+.movieInfoPartRight {
+	display: flex; 
+	flex-wrap: wrap;
+	align-items: center;
+}
+.movieInfoPartLeft {
+	padding-right: 15px;
+}
+.movieInfoTitle, .movieInfoDate {
+	margin: 0;
+}
+.movieInfoTitle {
+	font-size: 2.2em;
+	color: white;
+}
+.movieInfoDate {
+	margin-top: .4em;
+	font-size: 1.3em;
+	color: rgba(255, 255, 255, 0.75);
+}
+.rating {
+	padding: 5px 15px;
+	display: flex; flex-wrap: wrap;
+	align-items: center;
+}
+.ratingsDiv h2, .yourViewingsDiv h2 {
+	padding-left: 15px;
+}
+.miniRating, .miniDate {
+	padding: 12px 25px;
+	border-radius: 4px;
+	background: purple;
+	display: flex; justify-content: center;
+}
+.miniRating {
+	width: 22.25px;
+}
+.miniRating p, .miniDate p {
+	margin: 0;
+}
+
+.horrible {
+	background: #d04040;
+	color: white;
+}
+.medium {
+	background: orange;
+	color: white;
+}
+.good {
+	background: #6deb70;
+	color: black;
+}
+.toEdit {
+	margin: 0;
+}
+
+.emptyState {
+	padding: 15px;
+}
+.emptyState, .emptyStateContent {
+	text-align: center;
+	display: flex; flex-wrap: wrap;
+	justify-content: center; align-items: center;
+}
+.emptyState .toSearch {
+	padding: 20px 60px;
+	font-size: 1em;
+	border: 0; border-radius: 4px;
+	background: var(--main);
+	color: var(--textOnMain);
+	display: flex; align-items: center;
+}
+.emptyState .toSearch svg {
+	margin-right: 15px;
+}
+.emptyState h1 {
+	width: 100%;
+	text-align: center;
+}
+
+.addRemoveBig {
+	height: 23px;
+}
+.addRemoveDetails {
+	width: calc(100% - 20px);
+	padding: 0 20px;
+	text-align: center;
+	font-size: 16px;
+}
+
+.themeDiv {
+	width: 100%;
+	height: 100px;
+	display: flex;
+	flex-wrap: nowrap;
+}
+.themeDiv .themeButton {
+	border: 0; margin: 0; border-radius: 0; padding: 0;
+	width: 100%; height: 100%;
+	font-size: 40px;
+	background: var(--body);
+	opacity: 0.4;
+}
+.themeDiv .themeButton svg {
+	width: 30px;
+	height: 30px;
+}
+[data-theme="day"] .themeDiv .themeButton.day {
+	opacity: 1;
+}
+[data-theme="night"] .themeDiv .themeButton.night {
+	opacity: 1;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700');
+.authDivTop {
+	margin: 0;
+	background: url("https://jipfr.nl/mvlist-new/front/posters.png");
+	background-size: cover;
+	background-position: center;
+}
+.authDiv {
+	width: 100%; min-height: 100vh;
+	background: var(--main);
+	display: flex; flex-wrap: wrap;
+	justify-content: center; align-items: center;
+}
+.authDiv .card {
+	width: calc(90% - 15px); max-width: 300px;
+	min-height: 250px;
+	background: var(--body);
+	border-radius: 6px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+	padding: 30px;
+	font-family: Nanum Gothic, Arial;
+	margin: 10px;
+}
+.authDiv h1 {
+	margin: 0;
+}
+.authDiv p {
+	font-family: Arial;
+	margin-bottom: 5px;
+}
+.errorCode, .errorCodeUp {
+	height: 20px;
+	color: var(--main);
+}
+.authDiv input {
+	padding: 5px 15px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 4px;
+}
+.authDiv .buttonDiv {
+	margin-top: 10px;
+}
+.authDiv button {
+	padding: 15px 40px;
+	border: 0; border-radius: 6px;
+	background: var(--main);
+	color: var(--textOnMain);
+}

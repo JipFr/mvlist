@@ -1,0 +1,9 @@
+{
+	"name": "mvlist",
+	"short_name": "mvlist",
+	"lang": "en",
+	"display": "standalone",
+	"theme_color": "#d04040",
+	"background_color": "#ffffff",	
+	"icons": []
+}
