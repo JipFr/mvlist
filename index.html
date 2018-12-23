@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-111004523-4"></script>
 		<script>
-		  window.dataLayer = window.dataLayer || [];
-		  function gtag(){dataLayer.push(arguments);}
-		  gtag('js', new Date());
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
 
-		  gtag('config', 'UA-119445027-1');
+		gtag('config', 'UA-111004523-4');
 		</script>
+
 		
 		<title>mvlist</title>
-		<link rel="manifest" href="/mvlist-new/front/manifest.json">
+		<link rel="manifest" href="/mvlist2/manifest.json">
 		<!-- Apple stuff. -->
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 		<meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,12 +38,12 @@
 		<!-- Viewport -->
 		<meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=0.8, minimum-scale=0.8, user-scalable=no, minimal-ui, viewport-fit=cover">
 		<!-- Twitter stuff -->
-		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:card" content="summary" />
 		<meta name="twitter:site" content="@jipfr" />
 		<meta name="twitter:creator" content="@jipfr" />
 		<meta name="twitter:title" content="mvlist">
 		<meta name="twitter:description" content="Mark what movies you want to see, see when they come out, and if they already have, view them on your watchlist!" />
-		<meta name="twitter:image:src" content="https://mvlist.jipfr.nl/poster.png" />
+		<meta name="twitter:image:src" content="https://jipfr.nl/mvlist2/apple-touch-icon.png" />
 	</head>
 	<body data-theme="night">
 		<script>
@@ -121,7 +124,7 @@
 								<div class="movieNav" onclick="setTab(['tab', 'backupTab'], localStorage.getItem('backupTab'), false)">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>
 								</div>
-								<div class="movieNav" onclick="fetch(`${API}next?q=test&id=${document.querySelector('.movie').getAttribute('data-imdb-id')}`); setTimeout(function() {  loadUser(); }, 500)">
+								<div class="movieNav" onclick="fetch(`${API}next?q=${localStorage.getItem('user')}&id=${document.querySelector('.movie').getAttribute('data-imdb-id')}`); setTimeout(function() {  loadUser(); }, 500)">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
 								</div>
 							</div>
@@ -157,6 +160,7 @@
 									<p class="addRemoveDetails addRemoveDetailsNeg"></p>
 								</div>
 							</div>
+							<div class="extrasDiv"></div>
 							<div class="ratingsDiv"></div>
 							<div class="yourViewingsDiv"></div>
 							<div class="posterDiv"></div>
@@ -188,5 +192,6 @@
 	<script src="tabs.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/locale/en-gb.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 	<script src="main.js"></script>
 </html>

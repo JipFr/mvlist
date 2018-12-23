@@ -180,7 +180,7 @@ function loadUser() {
 				return b.watched.dates[b.watched.dates.length - 1] - a.watched.dates[a.watched.dates.length - 1]
 			});
 
-			clearInterval(recentInterval);
+
 			document.querySelector(".recentlyWatched").innerHTML = "";
 			updateRecentlyWatched(recentlyWatched);
 
@@ -290,7 +290,7 @@ function loadUser() {
 				}
 			});
 			if(newRecent2.length > 0) {
-				document.querySelector(".recentReleasesDiv").innerHTML = '<h2 class="title">Recent releases</h2><div class="recentReleasesMovies"></div>';
+				document.querySelector(".recentReleasesDiv").innerHTML = '<h2 class="title">Recent releases on your list</h2><div class="recentReleasesMovies"></div>';
 				newRecent2.forEach(movie => {
 					document.querySelector(".recentReleasesMovies").innerHTML += `
 						<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
@@ -453,39 +453,59 @@ document.addEventListener("scroll", () => {
 	}
 });
 
+let recentlyWatchedCounter = 0;
+let allRecentlyWatched = [];
 function updateRecentlyWatched(list) {
 
-	document.querySelector(".recentlyWatched").innerHTML = "";
+	allRecentlyWatched = list;
 
-	function runUpdateRecent() {
-		if(list[i]) {
-			document.querySelector(".recentlyWatched").innerHTML += `<img onclick="showMovie('${list[i].id}')" class="poster big" src="${movieCache[list[i].id].Poster}">`
-		} else {
-			clearInterval(recentInterval);
-		}
-		i++
-	}
+	document.querySelector(".recentlyWatched").innerHTML = "";
+	recentlyWatchedCounter = 0;
 
 	let i = 0;
 	for(let nV = 5; nV > 0; nV--) {
 		runUpdateRecent();
 	}
-	recentInterval = setInterval(function() {
-		runUpdateRecent();
-	}, 200);
 }
+
+function runUpdateRecent() {
+	for(let loop = 0; loop < 10; loop++) {
+		if(isAtRecentEnd()) {
+			if(allRecentlyWatched[recentlyWatchedCounter]) {
+				document.querySelector(".recentlyWatched").innerHTML += `<img onclick="showMovie('${allRecentlyWatched[recentlyWatchedCounter].id}')" class="poster big" src="${movieCache[allRecentlyWatched[recentlyWatchedCounter].id].Poster}">`
+			}
+			recentlyWatchedCounter++	
+		}
+			
+	}
+}
+
+document.querySelector(".recentlyWatched").addEventListener("scroll", () => {
+	runUpdateRecent();
+});
 
 function isAtBottom() {
 
-  	if(window.innerHeight + scrollTop >= document.querySelector(`.${localStorage.getItem("tab")}`).offsetHeight - 200) {
-    		return true;
-  	}
-  	return false;
+		if(window.innerHeight + scrollTop >= document.querySelector(`.${localStorage.getItem("tab")}`).offsetHeight - 200) {
+				return true;
+		}
+		return false;
 }
 
 // fetch(`next?q=test&id=tt1706593`);
 
 function showMovie(id) {
+	
+	document.querySelector(".extrasDiv").innerHTML = "";
+	fetch(`${API}extraMovieInfo/?user=${localStorage.getItem("user")}&id=${id}`).then(data => {
+		return data.json();
+	}).then(data => {
+		document.querySelector(".extrasDiv").innerHTML = "";
+		Object.keys(data).forEach(item => {
+			document.querySelector(".extrasDiv").innerHTML += `<div class="extrasDivBit"><h2>${item}</h2><div class="extrasDivPart">${data[item]}</div></div>`
+		});
+	});
+
 	document.querySelector(".container.movie").setAttribute("data-imdb-id", id);
 	document.querySelector(".movieBanner").style = `background: url("${movieCache[id].Poster && movieCache[id].Poster !== "N/A" ? movieCache[id].Poster : "assets/poster.png"}"); background-size: cover; background-position: center;`;
 
@@ -604,7 +624,6 @@ function showMovie(id) {
 
 	setTab(["tab"], "movie", true);
 }
-
 document.addEventListener("scroll", () => {
 	runMovieBanner();
 });
@@ -739,4 +758,10 @@ function pad(e) {
 function newTheme(theme) {
 	localStorage.setItem("force-theme", theme);
 	document.body.setAttribute("data-theme", theme);
+}
+
+function isAtRecentEnd() {
+	rs = document.querySelector(".recentlyWatched");
+	titleWidth = document.querySelector(".shown .title").scrollWidth;
+	return rs.scrollLeft + titleWidth >= rs.scrollWidth - titleWidth;
 }

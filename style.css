@@ -462,3 +462,11 @@ h4.movieText {
 	background: var(--main);
 	color: var(--textOnMain);
 }
+
+video {
+	width: 100%;
+}
+.extrasDivBit {
+	padding: 20px;
+	padding-top: 0;
+}

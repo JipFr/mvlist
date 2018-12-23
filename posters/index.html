@@ -1,0 +1,35 @@
+<div>
+
+</div>
+<style>
+	body {
+		margin: 0;
+		background: black;
+	}
+	div {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, 100px);
+	}
+	img {
+		width: 100%;
+		margin: auto 0;
+	}
+</style>
+<script>
+const API = "https://api-mvlist.jipfr.nl/";
+fetch(`${API}user?q=${localStorage.getItem("user")}`).then(data => {
+	return data.json();
+}).then(data => {
+	list = [];
+	data.seen.forEach(item => {
+		if(list.indexOf(data.movieInfo[item.id].Poster !== "N/A" ? data.movieInfo[item.id].Poster : "../assets/poster.png") === -1) {
+			list.push(data.movieInfo[item.id].Poster !== "N/A" ? data.movieInfo[item.id].Poster : "../assets/poster.png" )
+		}
+		
+	});
+	list.forEach(poster => {
+		document.querySelector("div").innerHTML += `<img src="${poster}">`
+	});
+});
+</script>
