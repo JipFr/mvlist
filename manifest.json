@@ -4,6 +4,10 @@
 	"lang": "en",
 	"display": "standalone",
 	"theme_color": "#d04040",
-	"background_color": "#ffffff",	
-	"icons": []
+	"background_color": "#ffffff",
+	"start_url": "/",
+	"icons": [{
+		"sizes": "512x512",
+		"src": "apple-touch-icon.png"
+	}]
 }

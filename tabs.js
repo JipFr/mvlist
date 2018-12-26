@@ -5,7 +5,7 @@ shouldAni = false;
 
 setTimeout(function() {
 	if(document.querySelector(".container")) {
-		topHeightThing = document.querySelector('.container.shown').offsetTop;	
+		topHeightThing = document.querySelector('.container.shown').offsetTop;
 	}
 }, 200);
 
@@ -117,6 +117,8 @@ function updateTab(shouldAni) {
 }
 
 function setTab(whatfor, to, ani) {
+
+	topHeightThing = document.querySelector('.container.shown').offsetTop;
 
 	whatfor.forEach(function(f) {
 		localStorage.setItem(f, to);

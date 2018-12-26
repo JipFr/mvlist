@@ -1,3 +1,36 @@
+const sw = true;
+if (sw && navigator.onLine) {
+	if ('serviceWorker' in navigator) {
+		window.addEventListener('load', function() {
+			navigator.serviceWorker.register('sw.js').then(function(reg) {
+			}, function(err) {
+				console.log(err);
+			});
+		});
+	}
+} else if (!sw && navigator.onLine) {
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.getRegistrations().then(function(registrations) {
+			for (var registration of registrations) {
+				registration.unregister();
+			}
+		});
+	}
+}
+
+
+function rld() {
+	if(navigator.onLine) {
+		navigator.serviceWorker.getRegistrations().then(function(registrations) {
+			for (var registration of registrations) {
+				registration.unregister();
+			}
+		});	
+	}
+	location.reload();
+}
+
+
 const API = "https://api-mvlist.jipfr.nl/";
 const loading = '<div class="loadWrapper"><div class="loadCenter"></div></div>';
 const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -50,9 +83,15 @@ if(!localStorage.getItem("user")) {
 }
 
 window.onload = () => {
-	if(localStorage.getItem("user")) {
-		loadUser();
+	if(navigator.onLine) {
+		if(localStorage.getItem("user")) {
+			loadUser();
+		}	
+	} else {
+		document.querySelector(".containers").innerHTML = "Offline";
+		document.querySelector(".navDiv").remove();
 	}
+	
 }
 
 if(localStorage.getItem("movieCache")) {
@@ -357,7 +396,7 @@ function loadUser() {
 		}
 	}).catch(err => {
 		alert("Something went wrong!");
-		throw err;
+		alert(err);
 	});
 }
 
@@ -689,11 +728,11 @@ function newUser(username, password, shouldRun) {
 				localStorage.setItem("user", data.id);
 				location.reload();
 			} else {
-				document.querySelector(".errorCode2").innerHTML = data.message;
+				document.querySelector(".errorCodeUp").innerHTML = data.message;
 			}
 		});	
 	} else {
-		document.querySelector(".errorCode2").innerHTML = "Passwords don't match";
+		document.querySelector(".errorCodeUp").innerHTML = "Passwords don't match";
 	}	
 }
 
@@ -762,6 +801,6 @@ function newTheme(theme) {
 
 function isAtRecentEnd() {
 	rs = document.querySelector(".recentlyWatched");
-	titleWidth = document.querySelector(".shown .title").scrollWidth;
+	titleWidth = document.body.scrollWidth;
 	return rs.scrollLeft + titleWidth >= rs.scrollWidth - titleWidth;
 }
