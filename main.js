@@ -27,7 +27,9 @@ function rld() {
 			}
 		});	
 	}
-	location.reload();
+	setTimeout(function() {
+		location.reload();
+	}, 500);
 }
 
 
@@ -91,7 +93,6 @@ window.onload = () => {
 		document.querySelector(".containers").innerHTML = "Offline";
 		document.querySelector(".navDiv").remove();
 	}
-	
 }
 
 if(localStorage.getItem("movieCache")) {
@@ -184,26 +185,14 @@ function loadUser() {
 			console.log(data);
 			user = data;
 
-			document.querySelector(".movieInfoViews .toEdit").innerHTML = "This movie is not on your list.";
-			document.querySelector(".addRemoveDetailsPos").innerHTML = "Add this movie to your watchlist";
-			document.querySelector(".addRemoveDetailsNeg").innerHTML = "";
-
-			if(user && document.querySelector(".movie").getAttribute("data-imdb-id")) {
-				id = document.querySelector(".movie").getAttribute("data-imdb-id");
-				user.seen.forEach(item => {
-					if(item.id == id && item.watched.i > 0) {
-						document.querySelector(".movieInfoViews .toEdit").innerHTML = `You have seen this movie ${item.watched.i} time(s)`;
-						document.querySelector(".addRemoveDetailsPos").innerHTML = "I have just re-watched this movie!";
-						document.querySelector(".addRemoveDetailsNeg").innerHTML = "Remove a view from this movie.";
-					} else if(item.id == id && item.watched.i == 0) {
-						document.querySelector(".movieInfoViews .toEdit").innerHTML = `You have not yet seen this movie`;
-						document.querySelector(".addRemoveDetailsPos").innerHTML = "I have just seen this movie!";
-						document.querySelector(".addRemoveDetailsNeg").innerHTML = "Remove this movie from my watch-list.";
-					}
-				});	
-			}
-
 			addToMovieCache(data.movieInfo);
+
+			if(user && document.querySelector(".movie").getAttribute("data-imdb-id") && localStorage.getItem("tab") == "movie") {
+				id = document.querySelector(".movie").getAttribute("data-imdb-id");
+				orScroll = scrollTop
+				showMovie(id, false);
+				window.scrollTo(0, orScroll);
+			}
 
 
 
@@ -350,6 +339,60 @@ function loadUser() {
 			}
 
 
+
+			//	Empty state handling
+
+			document.querySelector(".topRatedDiv").innerHTML = "";
+
+			let topRatedMovies = [];
+			user.seen.forEach(item => {
+				if(user.ratings[item.id]) {
+					item.rating = Number(user.ratings[item.id]);
+					topRatedMovies.push(item);
+				}
+			});
+			
+			topRatedMovies.sort((a, b) => {
+				return b.rating - a.rating;
+			});
+
+			let newTopRated = [];
+			for(let i = 0; i < 3; i++) {
+				if(topRatedMovies[i]) {
+					newTopRated.push(topRatedMovies[i]);
+				}
+			}
+
+			if(newTopRated.length > 0) {
+				document.querySelector(".topRatedDiv").innerHTML = "<h2 class='title'>Your top rated</h2>";
+				newTopRated.forEach(movie => {
+					itemMovie = movie;
+					movie = movieCache[movie.id];
+					document.querySelector(".topRatedDiv").innerHTML += `
+						<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
+							<div class="inlineMovieLeft">
+								<div class="posterDivNew withStar">
+									<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
+									<div class="starRating">
+										<div class="starRatingLeft">
+											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+										</div>
+										<div class="starRatingRight">
+											<p>${itemMovie.rating}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="inlineMovieRight">
+								<div>
+									<h3 class="movieTitle movieText">${movie.Title}</h3>
+									<h4 class="movieSubTitle movieText">${movie.Released}</h4>
+								</div>
+							</div>
+						</div>
+					`
+				});
+			}
 
 			//	Empty state handling
 
@@ -533,7 +576,7 @@ function isAtBottom() {
 
 // fetch(`next?q=test&id=tt1706593`);
 
-function showMovie(id) {
+function showMovie(id, shouldAnimate = true) {
 	
 	document.querySelector(".extrasDiv").innerHTML = "";
 	fetch(`${API}extraMovieInfo/?user=${localStorage.getItem("user")}&id=${id}`).then(data => {
@@ -553,6 +596,13 @@ function showMovie(id) {
 
 	document.querySelector(".movieInfoDescription .toEdit").innerHTML = movieCache[id].Plot;
 
+	if(document.querySelector(".yourSelectedRating")) {
+		document.querySelector(".yourSelectedRating").classList.remove("yourSelectedRating");
+	}
+	if(user.ratings && user.ratings[id]) {
+		document.querySelector(`.yourRatingButton[data-btn="${user.ratings[id]}"]`).classList.add("yourSelectedRating");
+	}
+
 	if(movieCache[id] && movieCache[id].Poster && movieCache[id].Poster !== "N/A") {
 		document.querySelector(".posterDiv").innerHTML = `
 			<h2>Poster</h2>
@@ -565,8 +615,12 @@ function showMovie(id) {
 	}
 
 	let seen = [];
+	document.querySelector(".yourRatingDiv").classList.add("invisible");
 	user.seen.forEach(item => {
 		if(item.id == id) {
+			if(item.watched.i > 0) {
+				document.querySelector(".yourRatingDiv").classList.remove("invisible");
+			}
 			seen = JSON.parse(JSON.stringify(item.watched.dates));
 		}
 	});
@@ -576,9 +630,9 @@ function showMovie(id) {
 	newSeen = [];
 	seen.forEach(date => {
 		date = new Date(date);
-		str = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`;
+		str = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}, ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 		
-		newDate = moment(str, "YYYYMMDD").fromNow();
+		newDate = moment(str, "YYYYMMDD, h:mm:ss").fromNow();
 		newDate = newDate.split("");
 		newDate[0] = newDate[0].toUpperCase();
 		newDate = newDate.join("");
@@ -601,7 +655,7 @@ function showMovie(id) {
 					</div>
 					<div class="ratingRight">
 						<div class="miniDate good">
-							<p>${pad(d.getDate())}/${pad(d.getMonth())}/${d.getFullYear()}</p>
+							<p>${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}</p>
 						</div>
 					</div>
 				</div>
@@ -661,7 +715,7 @@ function showMovie(id) {
 		});	
 	}
 
-	setTab(["tab"], "movie", true);
+	setTab(["tab"], "movie", shouldAnimate);
 }
 document.addEventListener("scroll", () => {
 	runMovieBanner();
@@ -803,4 +857,21 @@ function isAtRecentEnd() {
 	rs = document.querySelector(".recentlyWatched");
 	titleWidth = document.body.scrollWidth;
 	return rs.scrollLeft + titleWidth >= rs.scrollWidth - titleWidth;
+}
+
+function setRating(id, rating) {
+	console.log(id, rating);
+	currentlySelected = document.querySelector(".yourSelectedRating");
+	if(currentlySelected) {
+		currentlySelected.classList.remove("yourSelectedRating");
+	}
+	document.querySelector('[data-btn="' + rating + '"]').classList.add("yourSelectedRating");
+	fetch(`${API}rating?id=${id}&rating=${rating}&user=${localStorage.getItem("user")}`).then(data => {
+		return data.json();
+	}).then(data => {
+		if(data.status == 200) {
+			console.log("Updated rating");
+			loadUser();
+		}
+	});
 }

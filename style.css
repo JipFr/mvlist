@@ -121,6 +121,7 @@ h4.movieText {
 
 .container {
 	background: var(--body);
+	padding-bottom: calc(72px + env(safe-area-inset-bottom));
 }
 
 .navDiv {
@@ -325,7 +326,7 @@ h4.movieText {
 	display: flex; flex-wrap: wrap;
 	align-items: center;
 }
-.ratingsDiv h2, .yourViewingsDiv h2 {
+.ratingsDiv h2, .yourViewingsDiv h2, .yourRatingDiv h2 {
 	padding-left: 15px;
 }
 .miniRating, .miniDate {
@@ -468,6 +469,58 @@ video {
 	width: 100%;
 }
 .extrasDivBit {
-	padding: 20px;
+	padding: 15px;
 	padding-top: 0;
+}
+
+.yourRatingsDiv {
+	display: flex; flex-wrap: nowrap;
+	width: 100%;
+}
+.yourRatingButton {
+	width: 100%; height: 50px;
+	border: 2px solid transparent;
+	display: flex;
+	justify-content: center; align-items: center;
+	opacity: 0.3;
+}
+.yourRatingButton.yourSelectedRating {
+	opacity: 1;
+	border: 2px solid var(--border);
+	border-radius: 4px;
+}
+.invisible {
+	display: none;
+}
+
+.withStar {
+	position: relative;
+	z-index: 1;
+}
+.starRating {
+	position: absolute;
+	right: 10px; top: 10px;
+	padding: 2px 5px;
+	background: rgba(0, 0, 0, 0.7);
+	border-radius: 4px;
+	color: white;
+	display: flex; flex-wrap: nowrap;
+	align-items: center;
+}
+.starRatingLeft, .starRatingRight {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.starRating .starRatingRight {
+	width: 20px;
+	
+}
+.starRating .starRatingRight p {
+	margin: 0;
+}
+.starRating svg {
+	margin-right: 5px;
+	width: 15px;
+	height: 15px;
 }

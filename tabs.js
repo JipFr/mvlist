@@ -41,7 +41,6 @@ document.querySelector('body').innerHTML += `
 			flex-wrap: wrap; 
 			align-items: flex-start;
 			min-height: calc(100vh - 72px - (52px + env(safe-area-inset-top)));
-			padding-bottom: 72px;
 		}
 		.slideIn {
 			position: fixed;
@@ -112,8 +111,11 @@ function updateTab(shouldAni) {
 		document.querySelector(`.${tab}`).style = "z-index: 400";
 		document.querySelector(`.${localStorage.getItem('tab')}`).classList.add('shown');
 	}
-	localStorage.setItem("prevTab", prevTab);
-	prevTab = localStorage.getItem('tab');
+	if(localStorage.getItem("tab") !== prevTab) {
+		localStorage.setItem("prevTab", prevTab);
+		prevTab = localStorage.getItem('tab');	
+	}
+	
 }
 
 function setTab(whatfor, to, ani) {
