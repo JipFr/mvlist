@@ -524,3 +524,20 @@ video {
 	width: 15px;
 	height: 15px;
 }
+
+.topRatedMore {
+	-webkit-appearance: none;
+	margin: 0; padding: 0; border: 0; border-radius: 0;
+	padding: 20px 15px;
+	font-size: 1.2em;
+	width: 100%;
+	align-items: center;
+	background: white;
+	border-top: 1px solid var(--border);
+	border-bottom: 1px solid var(--border);
+}
+.topRatedMore p {
+	margin: 0;
+	display: flex;
+	align-items: center;
+}

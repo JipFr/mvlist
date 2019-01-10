@@ -39,8 +39,10 @@ const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frida
 let user = {}
 let tensLoaded = {
 	"upcoming": 1,
-	"watchlist": 1
+	"watchlist": 1,
+	"topRated": 1
 }
+const firstTensLoaded = tensLoaded;
 recentInterval = setInterval(() => {});
 watchlist = [];
 upcoming = [];
@@ -178,10 +180,7 @@ function loadUser() {
 	}).then(data => {
 		console.log("Loaded!");
 		if(data.status === 200) {
-			tensLoaded = {
-				"upcoming": 1,
-				"watchlist": 1
-			}
+			tensLoaded = firstTensLoaded;
 			console.log(data);
 			user = data;
 
@@ -344,7 +343,7 @@ function loadUser() {
 
 			document.querySelector(".topRatedDiv").innerHTML = "";
 
-			let topRatedMovies = [];
+			topRatedMovies = [];
 			user.seen.forEach(item => {
 				if(user.ratings[item.id]) {
 					item.rating = Number(user.ratings[item.id]);
@@ -356,7 +355,7 @@ function loadUser() {
 				return b.rating - a.rating;
 			});
 
-			let newTopRated = [];
+			newTopRated = [];
 			for(let i = 0; i < 3; i++) {
 				if(topRatedMovies[i]) {
 					newTopRated.push(topRatedMovies[i]);
@@ -392,7 +391,27 @@ function loadUser() {
 						</div>
 					`
 				});
+				document.querySelector(".topRatedDiv").innerHTML += `
+					<button class="spread topRatedMore" onclick='setTab(["tab"], "topRated", true)'>
+						<p>View more</p>
+						<p>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+						</p>
+					</button>
+				`
 			}
+
+			document.querySelector(".topRatedBigDiv").innerHTML = "";
+			addToTopRated();
+
+			document.addEventListener("scroll", () => {
+				if(localStorage.getItem("tab") == "topRated") {
+					if(isAtBottom()) {
+						addToTopRated();
+					}
+				}
+			});
+
 
 			//	Empty state handling
 
@@ -451,6 +470,50 @@ function updateWatchlist(newList) {
 	addToWatchlist();
 }
 
+function addToTopRated() {
+
+	if(topRatedMovies.length > 0) {
+
+		userMovies = {}
+
+		user.seen.forEach(item => {
+			userMovies[item.id] = item;
+		});
+
+		for(let i = 0; i < tensLoaded["topRated"] * 10; i++) {
+			if(topRatedMovies[(i + (tensLoaded["topRated"] * 10)) - 10]) {
+				movie = topRatedMovies[(i + (tensLoaded["topRated"] * 10)) - 10];
+				itemMovie = userMovies[movie.id];
+				movie = user.movieInfo[movie.id];
+				document.querySelector(".topRatedBigDiv").innerHTML += `
+					<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
+						<div class="inlineMovieLeft">
+							<div class="posterDivNew withStar">
+								<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
+								<div class="starRating">
+									<div class="starRatingLeft">
+										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+									</div>
+									<div class="starRatingRight">
+										<p>${itemMovie.rating}</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="inlineMovieRight">
+							<div>
+								<h3 class="movieTitle movieText">${movie.Title}</h3>
+								<h4 class="movieSubTitle movieText">${movie.Released}</h4>
+							</div>
+						</div>
+					</div>
+				`
+			}
+		}
+	}
+	tensLoaded.topRated++
+}
+
 function addToWatchlist() {
 	loaded = tensLoaded["watchlist"];
 	for(let i = (loaded-1) * 10; i < loaded * 10; i++) {
@@ -472,14 +535,6 @@ function addToWatchlist() {
 		}
 	}
 	tensLoaded["watchlist"]++
-}
-
-function updateUpcoming(newList) {
-
-	upcoming = newList;
-	
-	document.querySelector(".upcomingMoviesList").innerHTML = "";
-	addToUpcoming();
 }
 
 function addToUpcoming() {
@@ -521,6 +576,14 @@ function addToUpcoming() {
 		}
 	}
 	tensLoaded["upcoming"]++
+}
+
+function updateUpcoming(newList) {
+
+	upcoming = newList;
+	
+	document.querySelector(".upcomingMoviesList").innerHTML = "";
+	addToUpcoming();
 }
 
 document.addEventListener("scroll", () => {
