@@ -541,3 +541,9 @@ video {
 	display: flex;
 	align-items: center;
 }
+
+/* Center the "amount of times seen" and "runtime" parts of extended movie view. */
+.movieInfoRuntime, .movieInfoViews {
+	display: flex; flex-wrap: wrap;
+	align-items: center;
+}

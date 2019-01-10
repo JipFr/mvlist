@@ -664,6 +664,18 @@ function showMovie(id, shouldAnimate = true) {
 
 	document.querySelector(".movieInfoDescription .toEdit").innerHTML = movieCache[id].Plot;
 
+	time = timeConvert(Number(movieCache[id].Runtime.split(" ")[0]));
+
+	if(time[0]) {
+		time[0] = pad(time[0]);
+		time[1] = pad(time[1]);
+		time = `This movie lasts ${time.join(":")} hours.`;
+	} else {
+		time = "The runtime for this movie is unknown.";
+	}
+
+	document.querySelector(".movieInfoRuntime .toEdit").innerHTML = time;
+
 	if(document.querySelector(".yourSelectedRating")) {
 		document.querySelector(".yourSelectedRating").classList.remove("yourSelectedRating");
 	}
@@ -942,4 +954,13 @@ function setRating(id, rating) {
 			loadUser();
 		}
 	});
+}
+
+function timeConvert(n) {
+	var num = n;
+	var hours = (num / 60);
+	var rhours = Math.floor(hours);
+	var minutes = (hours - rhours) * 60;
+	var rminutes = Math.round(minutes);
+	return [rhours, rminutes];
 }
