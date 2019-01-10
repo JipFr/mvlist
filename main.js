@@ -42,7 +42,7 @@ let tensLoaded = {
 	"watchlist": 1,
 	"topRated": 1
 }
-const firstTensLoaded = tensLoaded;
+const firstTensLoaded = Object.assign({}, tensLoaded);
 recentInterval = setInterval(() => {});
 watchlist = [];
 upcoming = [];
@@ -180,7 +180,7 @@ function loadUser() {
 	}).then(data => {
 		console.log("Loaded!");
 		if(data.status === 200) {
-			tensLoaded = firstTensLoaded;
+			tensLoaded = Object.assign({}, firstTensLoaded);
 			console.log(data);
 			user = data;
 
