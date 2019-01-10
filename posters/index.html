@@ -21,15 +21,86 @@ const API = "https://api-mvlist.jipfr.nl/";
 fetch(`${API}user?q=${localStorage.getItem("user")}`).then(data => {
 	return data.json();
 }).then(data => {
+	user = data;
 	list = [];
+	allPromises = [];
 	data.seen.forEach(item => {
-		if(list.indexOf(data.movieInfo[item.id].Poster !== "N/A" ? data.movieInfo[item.id].Poster : "../assets/poster.png") === -1) {
-			list.push(data.movieInfo[item.id].Poster !== "N/A" ? data.movieInfo[item.id].Poster : "../assets/poster.png" )
+		
+		poster = data.movieInfo[item.id].Poster && data.movieInfo[item.id].Poster !== "N/A" ? data.movieInfo[item.id].Poster : null;
+
+		if(poster && list.indexOf(poster) === -1) {
+			list.push(poster);
+			allPromises.push(getImageLightness(poster));
+		}
+	});
+	allPromises.splice(97, 1);
+	Promise.all(allPromises).then(arr => {
+
+		obj = {}
+		arr.forEach(n => {
+			obj[n[0]] = n[1];
+		});
+		console.log(obj);
+		
+		list.sort((a, b) => {
+			return obj[a] - obj[b];
+		});
+		list.forEach(poster => {
+			document.querySelector("div").innerHTML += `<img src="${poster}">`;
+		});
+		
+	});
+});
+
+
+function getImageLightness(imageSrc) {
+	return new Promise((resolve, reject) => {
+		try {
+			var img = document.createElement("img");
+			img.crossOrigin = "Anonymous";
+			img.src = imageSrc;
+			img.style.display = "none";
+			document.body.appendChild(img);
+
+			var colorSum = 0;
+
+			img.onload = function() {
+				// create canvas
+				var canvas = document.createElement("canvas");
+				canvas.width = this.width;
+				canvas.height = this.height;
+
+				var ctx = canvas.getContext("2d");
+				ctx.drawImage(this,0,0);
+
+				var imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+				var data = imageData.data;
+				var r,g,b,avg;
+
+				for(var x = 0, len = data.length; x < len; x+=4) {
+					r = data[x];
+					g = data[x+1];
+					b = data[x+2];
+
+					avg = Math.floor((r+g+b)/3);
+					colorSum += avg;
+				}
+
+				var brightness = Math.floor(colorSum / (this.width*this.height));
+				console.log("resolved")
+				let arr = [imageSrc, brightness];
+				resolve(arr);
+			}
+		} catch(err) {
+			console.log("rejected");
+			reject({
+				imageSrc: null
+			});
 		}
 		
 	});
-	list.forEach(poster => {
-		document.querySelector("div").innerHTML += `<img src="${poster}">`
-	});
-});
+	
+}
+
+
 </script>

@@ -480,38 +480,43 @@ function addToTopRated() {
 			userMovies[item.id] = item;
 		});
 
-		for(let i = 0; i < tensLoaded["topRated"] * 10; i++) {
+		for(let i = 0; i < (tensLoaded["topRated"] * 10) + 1; i++) {
 			if(topRatedMovies[(i + (tensLoaded["topRated"] * 10)) - 10]) {
-				movie = topRatedMovies[(i + (tensLoaded["topRated"] * 10)) - 10];
-				itemMovie = userMovies[movie.id];
-				movie = user.movieInfo[movie.id];
-				document.querySelector(".topRatedBigDiv").innerHTML += `
-					<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
-						<div class="inlineMovieLeft">
-							<div class="posterDivNew withStar">
-								<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
-								<div class="starRating">
-									<div class="starRatingLeft">
-										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-									</div>
-									<div class="starRatingRight">
-										<p>${itemMovie.rating}</p>
+				let movie = topRatedMovies[(i + (tensLoaded["topRated"] * 10)) - 10].id;
+				itemMovie = userMovies[movie];
+				movie = user.movieInfo[movie];
+				
+				if(!document.querySelector(`[data-rated-movie-id="${movie.imdbID}"]`)) {
+					document.querySelector(".topRatedBigDiv").innerHTML += `
+						<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')" data-rated-movie-id="${movie.imdbID}">
+							<div class="inlineMovieLeft">
+								<div class="posterDivNew withStar">
+									<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
+									<div class="starRating">
+										<div class="starRatingLeft">
+											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+										</div>
+										<div class="starRatingRight">
+											<p>${itemMovie.rating}</p>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-						<div class="inlineMovieRight">
-							<div>
-								<h3 class="movieTitle movieText">${movie.Title}</h3>
-								<h4 class="movieSubTitle movieText">${movie.Released}</h4>
+							<div class="inlineMovieRight">
+								<div>
+									<h3 class="movieTitle movieText">${movie.Title}</h3>
+									<h4 class="movieSubTitle movieText">${movie.Released}</h4>
+								</div>
 							</div>
 						</div>
-					</div>
-				`
+					`
+				}
+				
 			}
 		}
-	}
+
 	tensLoaded.topRated++
+	}
 }
 
 function addToWatchlist() {
