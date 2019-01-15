@@ -300,7 +300,6 @@ function loadUser() {
 			});
 
 			let newRecent = [];
-			console.log(recent);
 			recent.forEach(movie => {
 				if(new Date(movie.Released).getTime() - new Date().setHours(0, 0, 0, 0) <= 0) {
 					newRecent.push(movie);
