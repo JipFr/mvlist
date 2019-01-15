@@ -300,6 +300,7 @@ function loadUser() {
 			});
 
 			let newRecent = [];
+			console.log(recent);
 			recent.forEach(movie => {
 				if(new Date(movie.Released).getTime() - new Date().setHours(0, 0, 0, 0) <= 0) {
 					newRecent.push(movie);
@@ -459,6 +460,7 @@ function loadUser() {
 	}).catch(err => {
 		alert("Something went wrong!");
 		alert(err);
+		throw err;
 	});
 }
 
@@ -793,6 +795,28 @@ function showMovie(id, shouldAnimate = true) {
 				document.querySelector(".addRemoveDetailsNeg").innerHTML = "Remove this movie from my watch-list.";
 			}
 		});	
+	}
+
+	// Cast stuff.
+
+	document.querySelector(".castDiv").innerHTML = "";
+	movie = movieCache[id];
+	if(movie.Cast) {
+		document.querySelector(".castDiv").innerHTML = `<h2>Cast</h2><div class="castMembers"></div>`;
+		movie.Cast.forEach(actor => {
+			document.querySelector(".castMembers").innerHTML += `
+				<div class="inlineMovie">
+					<div class="inlineMovieLeft">
+						<img src="${actor.Image ? actor.Image : "assets/poster.png"}" class="actorImage">
+					</div>
+					<div class="inlineMovieRight">
+						<div>
+							<h3 class="movieTitle movieText">${actor.Actor}</h3>
+						</div>
+					</div>
+				</div>
+			`
+		});
 	}
 
 	setTab(["tab"], "movie", shouldAnimate);

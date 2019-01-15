@@ -73,8 +73,12 @@ header img {
 h4.movieText {
 	font-weight: 100;
 }
-
-.poster {
+.actorImage {
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+}
+.poster, .actorImage {
 	border-radius: 6px;
 	background: var(--border);
 	min-height: 50px;
@@ -173,6 +177,7 @@ h4.movieText {
     	appearance: none;
 
     	border: 0; border-radius: 0; padding: 0; margin: 0;
+    	border-radius: 6px;
     	height: calc(100% - 40px); width: calc(100% - 60px);
     	padding: 10px 12px;
     	border: 1px solid rgba(255, 255, 255, 0.2);
@@ -326,7 +331,7 @@ h4.movieText {
 	display: flex; flex-wrap: wrap;
 	align-items: center;
 }
-.ratingsDiv h2, .yourViewingsDiv h2, .yourRatingDiv h2 {
+.castDiv h2, .ratingsDiv h2, .yourViewingsDiv h2, .yourRatingDiv h2 {
 	padding-left: 15px;
 }
 .miniRating, .miniDate {
