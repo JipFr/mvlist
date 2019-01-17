@@ -984,9 +984,3 @@ function getInlineMovie(id, subtitle = "Year") {
 		</div>
 	</div>`
 }
-
-fetch(`${API}getModern`).then(data => {
-	return data.json();
-}).then(data => {
-	console.log(data);
-});
