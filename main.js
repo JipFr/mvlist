@@ -139,34 +139,37 @@ function search(value, isEnd = false) {
 		fetch(`${API}search?q=${value}&isEnd=${isEnd}`).then(data => {
 			return data.json();
 		}).then(data => {
-			data = data.sort((a, b) => {
-				if((a.Poster && a.Poster !== "N/A") && (!b.Poster || b.Poster == "N/A")) {
-					return -1;
-				} else if((b.Poster && b.Poster !== "N/A") && (!a.Poster || a.Poster == "N/A")) {
-					return 1;
-				} else {
-					return 0;
-				}
-			});
-			newHTML = "";
-			data.forEach(movie => {
-				movieCache[movie.imdbID] = movie;
-				newHTML += `
-				<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
-					<div class="inlineMovieLeft">
-						<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
-					</div>
-					<div class="inlineMovieRight">
-						<div>
-							<h3 class="movieTitle movieText">${movie.Title}</h3>
-							<h4 class="movieSubTitle movieText">${movie.Year}</h4>
+			if(data.query == document.querySelector(".searchInput").value && data.status == 200) {
+				data = data.movies;
+				data = data.sort((a, b) => {
+					if((a.Poster && a.Poster !== "N/A") && (!b.Poster || b.Poster == "N/A")) {
+						return -1;
+					} else if((b.Poster && b.Poster !== "N/A") && (!a.Poster || a.Poster == "N/A")) {
+						return 1;
+					} else {
+						return 0;
+					}
+				});
+				newHTML = "";
+				data.forEach(movie => {
+					movieCache[movie.imdbID] = movie;
+					newHTML += `
+					<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
+						<div class="inlineMovieLeft">
+							<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
+						</div>
+						<div class="inlineMovieRight">
+							<div>
+								<h3 class="movieTitle movieText">${movie.Title}</h3>
+								<h4 class="movieSubTitle movieText">${movie.Year}</h4>
+							</div>
 						</div>
 					</div>
-				</div>
-				`
-			});
-			localStorage.setItem("movieCache", JSON.stringify(movieCache));
-			document.querySelector(".searchBox").innerHTML = newHTML;
+					`
+				});
+				localStorage.setItem("movieCache", JSON.stringify(movieCache));
+				document.querySelector(".searchBox").innerHTML = newHTML;
+			}
 		});
 	}
 }
@@ -800,17 +803,32 @@ function showMovie(id, shouldAnimate = true) {
 
 	document.querySelector(".castDiv").innerHTML = "";
 	movie = movieCache[id];
+	movie.Cast = movie.Actors.split(", ");
 	if(movie.Cast) {
 		document.querySelector(".castDiv").innerHTML = `<h2>Cast</h2><div class="castMembers"></div>`;
 		movie.Cast.forEach(actor => {
+			fetch(`${API}getActor?name=${actor}`).then(data => {
+				return data.json();
+			}).then(data => {
+				let newEl = document.querySelector(`[data-actor-name="${data.query}"]`);
+				if(data.status == 200 && newEl) {
+					if(data.data.i) {
+						newEl.querySelector("img").src = data.data.i[0];	
+					} else {
+						newEl.querySelector("img").src = "assets/poster.png";
+					}
+				} else if(data.status == 404 && newEl) {
+					newEl.querySelector("img").src = "assets/poster.png";
+				}
+			});
 			document.querySelector(".castMembers").innerHTML += `
-				<div class="inlineMovie">
+				<div class="inlineMovie inlineActor" data-actor-name="${actor}" onclick="search = window.open('https://www.google.com/search?q=${actor}')">
 					<div class="inlineMovieLeft">
-						<img src="${actor.Image ? actor.Image : "assets/poster.png"}" class="actorImage">
+						<img src="blank.png" class="actorImage" onerror="this.src = 'assets/poster.png';">
 					</div>
 					<div class="inlineMovieRight">
 						<div>
-							<h3 class="movieTitle movieText">${actor.Actor}</h3>
+							<h3 class="movieTitle movieText">${actor}</h3>
 						</div>
 					</div>
 				</div>
