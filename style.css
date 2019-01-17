@@ -31,7 +31,7 @@ body {
 	font-family: Arial;
 }
 * {
-     	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 header, .behindHeader {
 	width: 100%;
@@ -91,7 +91,6 @@ h4.movieText {
 }
 .poster.huge {
 	width: 100%;
-	max-width: 400px;
 }
 
 .posterDiv {
@@ -105,7 +104,7 @@ h4.movieText {
 }
 .posterDiv .poster.huge {
 	-webkit-user-select: initial;
-    	-webkit-touch-callout: initial;
+	-webkit-touch-callout: initial;
 }
 
 .recentlyWatched {
@@ -173,18 +172,18 @@ h4.movieText {
 }
 .searchInput {
 	-webkit-appearance: none;
-    	-moz-appearance: none;
-    	appearance: none;
+	-moz-appearance: none;
+	appearance: none;
 
-    	border: 0; border-radius: 0; padding: 0; margin: 0;
-    	border-radius: 6px;
-    	height: calc(100% - 40px); width: calc(100% - 60px);
-    	padding: 10px 12px;
-    	border: 1px solid rgba(255, 255, 255, 0.2);
-    	font-size: 16px;
+border: 0; border-radius: 0; padding: 0; margin: 0;
+	border-radius: 6px;
+	height: calc(100% - 40px); width: calc(100% - 60px);
+	padding: 10px 12px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	font-size: 16px;
 
-    	background: var(--main);
-    	color: var(--textOnMain);
+	background: var(--main);
+	color: var(--textOnMain);
 }
 ::placeholder {
 	color: rgba(255, 255, 255, 0.5);

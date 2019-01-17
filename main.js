@@ -934,22 +934,24 @@ document.querySelector(".movie").addEventListener("touchmove", evt => {
 		document.querySelector(".movie").style.left = `${touch.divX - 50}px`;
 	} else {
 		endMovieTouch();
-		document.querySelector(".movie").style.left = `0`;
 		runMovieBanner();
+		document.querySelector(".movie").style.left = `0`;
 	}
 });
 
 document.querySelector(".movie").addEventListener("touchend", evt => {
 	endMovieTouch();
-	if(touch.percentage > 30/*% of the screen width*/) {
+
+	document.querySelector(".movie").style.left = `0`;
+	document.querySelector(".movie").style.top = `auto`;
+	
+	if(touch.percentage > 50/*% of the screen width*/) {
 		setTab(["tab", "backupTab"], localStorage.getItem("prevTab"), false);
 	} else {
 		if(touch.isDoingStuff) {
 			window.scrollTo(0, touch.fromTop);	
 		}
 	}
-	document.querySelector(".movie").style.left = `0`;
-	document.querySelector(".movie").style.top = `auto`;
 	
 	touch = {
 		isDoingStuff: false
