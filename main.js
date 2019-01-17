@@ -116,9 +116,15 @@ document.addEventListener("scroll", () => {
 });
 
 function addToMovieCache(obj) {
-	Object.keys(obj).forEach(key => {
-		movieCache[key] = obj[key];
-	});
+	if(!Array.isArray(obj)) {
+		Object.keys(obj).forEach(key => {
+			movieCache[key] = obj[key];
+		});
+	} else {
+		obj.forEach(movie => {
+			movieCache[movie.imdbID] = movie;
+		});
+	}
 	localStorage.setItem("movieCache", JSON.stringify(movieCache));
 }
 
@@ -141,6 +147,8 @@ function search(value, isEnd = false) {
 		}).then(data => {
 			if(data.query == document.querySelector(".searchInput").value && data.status == 200) {
 				data = data.movies;
+				addToMovieCache(data);
+				console.log(data);
 				data = data.sort((a, b) => {
 					if((a.Poster && a.Poster !== "N/A") && (!b.Poster || b.Poster == "N/A")) {
 						return -1;
@@ -152,20 +160,7 @@ function search(value, isEnd = false) {
 				});
 				newHTML = "";
 				data.forEach(movie => {
-					movieCache[movie.imdbID] = movie;
-					newHTML += `
-					<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
-						<div class="inlineMovieLeft">
-							<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
-						</div>
-						<div class="inlineMovieRight">
-							<div>
-								<h3 class="movieTitle movieText">${movie.Title}</h3>
-								<h4 class="movieSubTitle movieText">${movie.Year}</h4>
-							</div>
-						</div>
-					</div>
-					`
+					newHTML += getInlineMovie(movie.imdbID, "Year");
 				});
 				localStorage.setItem("movieCache", JSON.stringify(movieCache));
 				document.querySelector(".searchBox").innerHTML = newHTML;
@@ -177,6 +172,18 @@ function search(value, isEnd = false) {
 
 function loadUser() {
 	console.log("Loading user...");
+
+	fetch(`${API}getModern`).then(data => {
+		return data.json();
+	}).then(data => {
+		addToMovieCache(data);
+		if(data.length > 0) {
+			document.querySelector(".trendingNowContents").innerHTML = "";
+			data.forEach(movie => {
+				document.querySelector(".trendingNowContents").innerHTML += getInlineMovie(movie.imdbID);
+			});
+		}
+	});
 
 	fetch(API + "user?q="+localStorage.getItem("user")).then(data => {
 		return data.json();
@@ -275,17 +282,7 @@ function loadUser() {
 					movie = movieCache[item.id];
 					document.querySelector(".upNextDiv").innerHTML = `
 						<h2 class="title">Up next</h2>
-						<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
-							<div class="inlineMovieLeft">
-								<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
-							</div>
-							<div class="inlineMovieRight">
-								<div>
-									<h3 class="movieTitle movieText">${movie.Title}</h3>
-									<h4 class="movieSubTitle movieText">${movie.Year}</h4>
-								</div>
-							</div>
-						</div>
+						${getInlineMovie(movie.imdbID, "Year")}
 					`
 				}
 			});
@@ -322,19 +319,7 @@ function loadUser() {
 			if(newRecent2.length > 0) {
 				document.querySelector(".recentReleasesDiv").innerHTML = '<h2 class="title">Recent releases on your list</h2><div class="recentReleasesMovies"></div>';
 				newRecent2.forEach(movie => {
-					document.querySelector(".recentReleasesMovies").innerHTML += `
-						<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
-							<div class="inlineMovieLeft">
-								<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
-							</div>
-							<div class="inlineMovieRight">
-								<div>
-									<h3 class="movieTitle movieText">${movie.Title}</h3>
-									<h4 class="movieSubTitle movieText">${movie.Released}</h4>
-								</div>
-							</div>
-						</div>
-					`
+					document.querySelector(".recentReleasesMovies").innerHTML += getInlineMovie(movie.imdbID, "Year");
 				});
 			} else {
 				document.querySelector(".recentReleasesDiv").innerHTML = "";
@@ -528,19 +513,7 @@ function addToWatchlist() {
 	for(let i = (loaded-1) * 10; i < loaded * 10; i++) {
 		if(watchlist[i] && movieCache[watchlist[i].id]) {
 			movie = movieCache[watchlist[i].id];
-			document.querySelector(".watchlistMoviesList").innerHTML += `
-				<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
-					<div class="inlineMovieLeft">
-						<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
-					</div>
-					<div class="inlineMovieRight">
-						<div>
-							<h3 class="movieTitle movieText">${movie.Title}</h3>
-							<h4 class="movieSubTitle movieText">${movie.Year}</h4>
-						</div>
-					</div>
-				</div>
-			`
+			document.querySelector(".watchlistMoviesList").innerHTML += getInlineMovie(watchlist[i].id);
 		}
 	}
 	tensLoaded["watchlist"]++
@@ -569,19 +542,7 @@ function addToUpcoming() {
 				upcoming[i].subtitle = "";
 			}
 
-			document.querySelector(".upcomingMoviesList").innerHTML += `
-				<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
-					<div class="inlineMovieLeft">
-						<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
-					</div>
-					<div class="inlineMovieRight">
-						<div>
-							<h3 class="movieTitle movieText">${movie.Title}</h3>
-							<h4 class="movieSubTitle movieText">${upcoming[i].subtitle}</h4>
-						</div>
-					</div>
-				</div>
-			`
+			document.querySelector(".upcomingMoviesList").innerHTML += getInlineMovie(upcoming[i].id, upcoming[i].subtitle);
 		}
 	}
 	tensLoaded["upcoming"]++
@@ -1007,3 +968,25 @@ function timeConvert(n) {
 	var rminutes = Math.round(minutes);
 	return [rhours, rminutes];
 }
+
+function getInlineMovie(id, subtitle = "Year") {
+	movie = movieCache[id];
+	return `
+	<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
+		<div class="inlineMovieLeft">
+			<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
+		</div>
+		<div class="inlineMovieRight">
+			<div>
+				<h3 class="movieTitle movieText">${movie.Title}</h3>
+				<h4 class="movieSubTitle movieText">${movie[subtitle] || subtitle}</h4>
+			</div>
+		</div>
+	</div>`
+}
+
+fetch(`${API}getModern`).then(data => {
+	return data.json();
+}).then(data => {
+	console.log(data);
+});
