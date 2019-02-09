@@ -173,17 +173,17 @@ function search(value, isEnd = false) {
 function loadUser() {
 	console.log("Loading user...");
 
-	fetch(`${API}getModern`).then(data => {
-		return data.json();
-	}).then(data => {
-		addToMovieCache(data);
-		if(data.length > 0) {
-			document.querySelector(".trendingNowContents").innerHTML = "";
-			data.forEach(movie => {
-				document.querySelector(".trendingNowContents").innerHTML += getInlineMovie(movie.imdbID);
-			});
-		}
-	});
+	// fetch(`${API}getModern`).then(data => {
+	// 	return data.json();
+	// }).then(data => {
+	// 	addToMovieCache(data);
+	// 	if(data.length > 0) {
+	// 		document.querySelector(".trendingNowContents").innerHTML = "";
+	// 		data.forEach(movie => {
+	// 			document.querySelector(".trendingNowContents").innerHTML += getInlineMovie(movie.imdbID);
+	// 		});
+	// 	}
+	// });
 
 	fetch(API + "user?q="+localStorage.getItem("user")).then(data => {
 		return data.json();
