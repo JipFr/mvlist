@@ -18,7 +18,6 @@ if (sw && navigator.onLine) {
 	}
 }
 
-
 function rld() {
 	if(navigator.onLine) {
 		navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -173,23 +172,27 @@ function search(value, isEnd = false) {
 function loadUser() {
 	console.log("Loading user...");
 
-	// fetch(`${API}getModern`).then(data => {
-	// 	return data.json();
-	// }).then(data => {
-	// 	addToMovieCache(data);
-	// 	if(data.length > 0) {
-	// 		document.querySelector(".trendingNowContents").innerHTML = "";
-	// 		data.forEach(movie => {
-	// 			document.querySelector(".trendingNowContents").innerHTML += getInlineMovie(movie.imdbID);
-	// 		});
-	// 	}
-	// });
-
 	fetch(API + "user?q="+localStorage.getItem("user")).then(data => {
 		return data.json();
 	}).then(data => {
 		console.log("Loaded!");
 		if(data.status === 200) {
+
+			// Sentry.configureScope((scope) => {
+			//   scope.setUser({"name": data.display});
+			// });
+
+			data.seen.forEach(d => {
+				d.id = d.id.trim();
+			});
+
+			if(data.extraHTML) {
+				h = data.extraHTML;
+				Object.keys(h).forEach(key => {
+					document.querySelector(`.${key}`).innerHTML = h[key];
+				});
+			}
+
 			tensLoaded = Object.assign({}, firstTensLoaded);
 			console.log(data);
 			user = data;
@@ -203,7 +206,9 @@ function loadUser() {
 				window.scrollTo(0, orScroll);
 			}
 
+			//  Filter data
 
+			data.seen = data.seen.filter(d => d && movieCache[d.id]);
 
 			//	Updating recently watched
 
@@ -222,12 +227,12 @@ function loadUser() {
 			updateRecentlyWatched(recentlyWatched);
 
 
-
 			//	Updating watchlist
 
 			watchlist = [];
 			data.seen.forEach(item => {
-				if(item.watched.i == 0 && new Date(movieCache[item.id].Released).getTime() < new Date().getTime()) {
+				item.id = item.id;
+				if(movieCache[item.id] && item.watched.i == 0 && new Date(movieCache[item.id].Released).getTime() < new Date().getTime()) {
 					watchlist.push(item);
 				}
 			});
@@ -244,7 +249,7 @@ function loadUser() {
 
 			upcoming = [];
 			data.seen.forEach(item => {
-				if(new Date(movieCache[item.id].Released).getTime() + 1000 > new Date().setHours(0, 0, 0, 0)) {
+				if(movieCache[item.id] && new Date(movieCache[item.id].Released).getTime() + 1000 > new Date().setHours(0, 0, 0, 0)) {
 
 					distance = new Date(movieCache[item.id].Released).getTime() - new Date().setHours(0, 0, 0, 0);
 					item.days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -305,19 +310,17 @@ function loadUser() {
 					newRecent.push(movie);
 				}
 			});
-			newRecent = newRecent.sort((a, b) => {
-				return new Date(b.Released).getTime() - new Date(a.Released).getTime();
-			});
-			newRecent = [newRecent[0], newRecent[1], newRecent[2]];
-			
+			console.log(newRecent);
+			newRecent = newRecent.sort((a, b) => new Date(b.Released).getTime() - new Date(a.Released).getTime());
+			console.log(newRecent);
+
 			newRecent2 = [];
-			newRecent.forEach(movie => {
-				if(movie) {
-					newRecent2.push(movie);
-				}
+			newRecent.slice(0, 3).forEach(movie => {
+				if(movie) newRecent2.push(movie);
 			});
 			if(newRecent2.length > 0) {
 				document.querySelector(".recentReleasesDiv").innerHTML = '<h2 class="title">Recent releases on your list</h2><div class="recentReleasesMovies"></div>';
+				
 				newRecent2.forEach(movie => {
 					document.querySelector(".recentReleasesMovies").innerHTML += getInlineMovie(movie.imdbID, "Year");
 				});
@@ -333,7 +336,7 @@ function loadUser() {
 
 			topRatedMovies = [];
 			user.seen.forEach(item => {
-				if(user.ratings[item.id]) {
+				if(user.ratings && user.ratings[item.id]) {
 					item.rating = Number(user.ratings[item.id]);
 					topRatedMovies.push(item);
 				}
@@ -408,7 +411,7 @@ function loadUser() {
 					<div class="emptyState">
 						<div class="emptyStateContent">
 							<h1>No movies on your watchlist!</h1>
-							<button class="toSearch" onclick='setTab(["tab", "backupTab"], "search", false); updateNav();'><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--textOnMain, black)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Go add some!</button>
+							<button class="toSearch" onclick='setTab(["tab", "backupTab"], "search", false); updateNav(); focusSearch()'><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--textOnMain, black)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Go add some!</button>
 						</div>
 					</div>
 				`
@@ -419,7 +422,7 @@ function loadUser() {
 					<div class="emptyState">
 						<div class="emptyStateContent">
 							<h1>No upcoming movies on your watchlist!</h1>
-							<button class="toSearch" onclick='setTab(["tab", "backupTab"], "search", false); updateNav();'><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--textOnMain, black)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Go add some!</button>
+							<button class="toSearch" onclick='setTab(["tab", "backupTab"], "search", false); updateNav(); focusSearch();'><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--textOnMain, black)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Go add some!</button>
 						</div>
 					</div>
 				`
@@ -445,7 +448,7 @@ function loadUser() {
 			console.log("Nothing found");
 		}
 	}).catch(err => {
-		alert("Something went wrong!");
+		alert("Something went wrong! This issue has been reported to the developer (probably)");
 		alert(err);
 		throw err;
 	});
@@ -512,6 +515,7 @@ function addToWatchlist() {
 	loaded = tensLoaded["watchlist"];
 	for(let i = (loaded-1) * 10; i < loaded * 10; i++) {
 		if(watchlist[i] && movieCache[watchlist[i].id]) {
+			watchlist[i].id = watchlist[i].id;
 			movie = movieCache[watchlist[i].id];
 			document.querySelector(".watchlistMoviesList").innerHTML += getInlineMovie(watchlist[i].id);
 		}
@@ -587,7 +591,8 @@ function runUpdateRecent() {
 	for(let loop = 0; loop < 10; loop++) {
 		if(isAtRecentEnd()) {
 			if(allRecentlyWatched[recentlyWatchedCounter]) {
-				document.querySelector(".recentlyWatched").innerHTML += `<img onclick="showMovie('${allRecentlyWatched[recentlyWatchedCounter].id}')" class="poster big" src="${movieCache[allRecentlyWatched[recentlyWatchedCounter].id].Poster}">`
+				let tmp = allRecentlyWatched[recentlyWatchedCounter];
+				document.querySelector(".recentlyWatched").innerHTML += `<div class="posterWrapper"><img data-movie="${tmp.id}" onclick="showMovie('${tmp.id}')" class="poster big" src="${movieCache[allRecentlyWatched[recentlyWatchedCounter].id].Poster}" onerror="poster_error(this)"></div>`
 			}
 			recentlyWatchedCounter++	
 		}
@@ -598,6 +603,19 @@ function runUpdateRecent() {
 document.querySelector(".recentlyWatched").addEventListener("scroll", () => {
 	runUpdateRecent();
 });
+
+function poster_error(el) {
+	el.src = "assets/poster.png";
+	let id = el.getAttribute("data-movie");
+	let movie = movieCache[id];
+	if(movie) {
+		el.parentNode.innerHTML += `
+			<div class="notFoundTitle">
+				<h3>${movie.Title}</h3>
+			</div>
+		`
+	}
+}
 
 function isAtBottom() {
 
@@ -610,6 +628,8 @@ function isAtBottom() {
 // fetch(`next?q=test&id=tt1706593`);
 
 function showMovie(id, shouldAnimate = true) {
+
+	id = id.trim();
 	
 	document.querySelector(".extrasDiv").innerHTML = "";
 	fetch(`${API}extraMovieInfo/?user=${localStorage.getItem("user")}&id=${id}`).then(data => {
@@ -620,6 +640,15 @@ function showMovie(id, shouldAnimate = true) {
 			document.querySelector(".extrasDiv").innerHTML += `<div class="extrasDivBit"><h2>${item}</h2><div class="extrasDivPart">${data[item]}</div></div>`
 		});
 	});
+
+	let on_list = false;
+	user.seen.forEach(obj => {
+		if(obj.id == id) {
+			on_list = true;
+		}
+	});
+	let class_function = on_list ? "remove" : "add";
+	document.querySelector(".container.movie").classList[class_function]("not_on_list");
 
 	document.querySelector(".container.movie").setAttribute("data-imdb-id", id);
 	document.querySelector(".movieBanner").style = `background: url("${movieCache[id].Poster && movieCache[id].Poster !== "N/A" ? movieCache[id].Poster : "assets/poster.png"}"); background-size: cover; background-position: center;`;
@@ -669,8 +698,10 @@ function showMovie(id, shouldAnimate = true) {
 			seen = JSON.parse(JSON.stringify(item.watched.dates));
 		}
 	});
-
-	seen.splice(0, 1);
+	
+	if(seen[0] == 0) {
+		seen.splice(0, 1);
+	}
 
 	newSeen = [];
 	seen.forEach(date => {
@@ -688,7 +719,6 @@ function showMovie(id, shouldAnimate = true) {
 	newSeen = newSeen.sort((a, b) => {
 		return b[1] - a[1];
 	});
-
 	if(newSeen.length > 0) {
 		document.querySelector(".yourViewingsDiv").innerHTML = "<h2>Your viewings</h2><div class='yourViewingsContent'></div>";
 		newSeen.forEach(arr => {
@@ -714,7 +744,7 @@ function showMovie(id, shouldAnimate = true) {
 	if(movieCache[id].Ratings && movieCache[id].Ratings.length > 0) {
 		document.querySelector(".ratingsDiv").innerHTML = "<h2>Ratings</h2>"
 		movieCache[id].Ratings.forEach(rating => {
-			rating.Value2 = Number(rating.Value.replace("%", "").replace(".", "").split("/")[0]);
+			rating.Value2 = Number(rating.Value.toString().replace("%", "").replace(".", "").split("/")[0]);
 			r = rating.Value2;
 
 			let ratingClass = "";
@@ -742,6 +772,8 @@ function showMovie(id, shouldAnimate = true) {
 		});
 	}
 
+	document.querySelector(".insertPlus").innerHTML = "+";
+	document.querySelector(".insertMinus").innerHTML = "-";
 	document.querySelector(".movieInfoViews .toEdit").innerHTML = "This movie is not on your list.";
 	document.querySelector(".addRemoveDetailsPos").innerHTML = "Add this movie to your watchlist";
 	document.querySelector(".addRemoveDetailsNeg").innerHTML = "";
@@ -823,6 +855,7 @@ function idOnList(id) {
 }
 
 function addView() {
+	document.querySelector(".insertPlus").innerHTML = `<div class="loadCenter"></div>`;
 	id = document.querySelector(".movie").getAttribute("data-imdb-id");
 	if(new Date(movieCache[id].Released) > new Date() && idOnList(id)) {
 		if(confirm("This movie is not out yet. Are you sure you want to add a view?")) {
@@ -837,6 +870,7 @@ function addView() {
 	}
 }
 function removeView() {
+	document.querySelector(".insertMinus").innerHTML = `<div class="loadCenter"></div>`;
 	id = document.querySelector(".movie").getAttribute("data-imdb-id");
 	fetch(`${API}removeView?q=${id}&user=${localStorage.getItem("user")}`).then(() => {
 		loadUser();
@@ -974,7 +1008,7 @@ function getInlineMovie(id, subtitle = "Year") {
 	return `
 	<div class="inlineMovie" onclick="showMovie('${movie.imdbID}')">
 		<div class="inlineMovieLeft">
-			<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small">
+			<img src="${movie.Poster && movie.Poster !== "N/A" ? movie.Poster : 'assets/poster.png'}" class="poster small" onerror="poster_error(this)">
 		</div>
 		<div class="inlineMovieRight">
 			<div>
@@ -984,3 +1018,33 @@ function getInlineMovie(id, subtitle = "Year") {
 		</div>
 	</div>`
 }
+
+
+function removeStreamer(name) {
+	fetch(`${API}removeStreamer/?user=${localStorage.getItem('user')}&name=${name}`).then(data => {
+		return data.text();
+	}).then(data => {
+		loadUser();
+	});
+}
+
+function addStreamer() {
+	let name = prompt("Insert name");
+	if(!name) return;
+	fetch(`${API}addStreamer/?user=${localStorage.getItem('user')}&name=${name}`).then(data => {
+		return data.text();
+	}).then(data => {
+		loadUser();
+	});
+}
+
+function focusSearch() {
+	if(document.querySelector(".searchBox").innerHTML.trim().length > 0) return;
+	document.querySelector(".searchInput").focus();
+}
+
+
+
+
+
+

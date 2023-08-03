@@ -26,7 +26,7 @@ fetch(`${API}user?q=${localStorage.getItem("user")}`).then(data => {
 	allPromises = [];
 	data.seen.forEach(item => {
 		
-		poster = data.movieInfo[item.id].Poster && data.movieInfo[item.id].Poster !== "N/A" ? data.movieInfo[item.id].Poster : null;
+		poster = data && data.movieInfo && data.movieInfo[item.id] && data.movieInfo[item.id].Poster && data.movieInfo[item.id].Poster !== "N/A" ? data.movieInfo[item.id].Poster : null;
 
 		if(poster && list.indexOf(poster) === -1) {
 			list.push(poster);
@@ -59,8 +59,8 @@ function getImageLightness(imageSrc) {
 			var img = document.createElement("img");
 			img.crossOrigin = "Anonymous";
 			img.src = imageSrc;
-			img.style.display = "none";
-			document.body.appendChild(img);
+			// img.style.display = "none";
+			document.querySelector("div").appendChild(img);
 
 			var colorSum = 0;
 

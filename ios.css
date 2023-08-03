@@ -1,0 +1,28 @@
+@media (prefers-color-scheme: dark) {
+	body[data-theme] {
+		--body: #191919;
+		--text: white;
+		--main: black;
+		--textOnMain: white;
+		--border: rgba(255, 255, 255, 0.1);
+		--title: #141414;
+		--titleText: white;
+	}
+	.themeDivWrapper {
+		display: none;
+	}
+}
+@media (prefers-color-scheme: light) {
+	body[data-theme] {
+		--body: white;
+		--text: #191919;
+		--main: #d04040;
+		--textOnMain: white;
+		--border: #e5e5e5;
+		--title: #ebebeb;
+		--titleText: rgba(0, 0, 0, 0.9);
+	}
+	.themeDivWrapper {
+		display: none;
+	}
+}

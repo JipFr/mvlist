@@ -17,6 +17,34 @@
 	--title: #141414;
 	--titleText: white;
 }
+@media (prefers-color-scheme: dark) {
+	body[data-theme] {
+		--body: #191919;
+		--text: white;
+		--main: black;
+		--textOnMain: white;
+		--border: rgba(255, 255, 255, 0.1);
+		--title: #141414;
+		--titleText: white;
+	}
+	.themeDivWrapper {
+		display: none;
+	}
+}
+@media (prefers-color-scheme: light) {
+	body[data-theme] {
+		--body: white;
+		--text: #191919;
+		--main: #d04040;
+		--textOnMain: white;
+		--border: #e5e5e5;
+		--title: #ebebeb;
+		--titleText: rgba(0, 0, 0, 0.9);
+	}
+	.themeDivWrapper {
+		display: none;
+	}
+}
 .fw {
 	width: 100%;
 }
@@ -31,7 +59,13 @@ body {
 	font-family: Arial;
 }
 * {
-	 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+.clickable {
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
+}
+.clickable:active {
+	outline: 5px solid rgba(0, 0, 0, 0.3);
 }
 header, .behindHeader {
 	width: 100%;
@@ -114,11 +148,11 @@ h4.movieText {
 	-webkit-overflow-scrolling: touch;
 	height: 240px;
 }
-.recentlyWatched .poster.big {
+.recentlyWatched .posterWrapper {
 	margin: 20px 0;
 	margin-left: 20px;
 }
-.recentlyWatched .poster.big:nth-last-child(1) {
+.recentlyWatched .posterWrapper:nth-last-child(1) {
 	margin-right: 100px;
 }
 
@@ -139,7 +173,7 @@ h4.movieText {
 }
 .navItem {
 	opacity: 0.5;
-	padding: 10px;
+	padding: 25px;
 	display: flex; justify-content: center; align-items: center;
 }
 .navItem.currentPage {
@@ -200,6 +234,7 @@ border: 0; border-radius: 0; padding: 0; margin: 0;
 }
 .loadCenter {
 	width: 40px; height: 40px;
+	border-radius: 4px;
 	background: var(--main);
 	animation: loadingAnimation 6s infinite;
 }
@@ -538,7 +573,8 @@ video {
 	font-size: 1.2em;
 	width: 100%;
 	align-items: center;
-	background: white;
+	background: var(--body);
+	color: var(--text);
 	border-top: 1px solid var(--border);
 	border-bottom: 1px solid var(--border);
 }
@@ -552,4 +588,27 @@ video {
 .movieInfoRuntime, .movieInfoViews {
 	display: flex;
 	align-items: center;
+}
+
+.posterWrapper {
+	position: relative;
+}
+.notFoundTitle {
+	position: absolute;
+	top: 0; left: 0;
+	width: 100%;
+	text-align: center;
+	color: white;
+	font-weight: 600;
+}
+
+.not_on_list .remove_btn {
+	display: none;
+}
+
+.topMovieInfoAddRemoveButton .loadCenter {
+	width: 25px;
+	height: 25px;
+	background: white;
+	margin-top: 20px;
 }

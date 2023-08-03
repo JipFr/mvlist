@@ -10,7 +10,7 @@ setTimeout(function() {
 }, 200);
 
 if(typeof defaultTab == 'undefined') {
-	defaultTab = "home";
+	defaultTab = "feed";
 }
 
 tabFrame();
